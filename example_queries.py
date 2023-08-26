@@ -1755,5 +1755,6 @@ field_mappings = [
     },
 ]
 
-obj = SQLQueryConversion(table_mappings, field_mappings)
-obj.get_converted_sql_query(queries[24])
+if __name__ == "__main__":
+    obj = SQLQueryConversion(table_mappings, field_mappings)
+    obj.get_converted_sql_query(queries[0])

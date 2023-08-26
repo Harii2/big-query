@@ -1,3 +1,4 @@
+import json
 import re
 from copy import deepcopy
 from typing import Dict, List
@@ -14,8 +15,7 @@ class SQLQueryConversion:
     def __init__(
         self,
         table_mappings: Dict[str, str],
-        field_mappings,
-        # value_mappings,
+        field_mappings: List[Dict],
     ):
         self.table_mappings = table_mappings
 
@@ -23,47 +23,9 @@ class SQLQueryConversion:
             field_mappings=deepcopy(field_mappings)
         )
 
-        # stage_field = (
-        #     list(value_mappings.keys())[0] if value_mappings else None
-        # )
-        # self.stage_mappings = (
-        #     value_mappings[stage_field] if stage_field else {}
-        # )
-        #
-        # self.stage_field = stage_field or "stage"
-
         self.mapped_fields_dict = {}
 
         self.aliases = []
-
-    def get_converted_sql_query(self, sql_query):
-        sql_query_updated = self.get_sql_query_with_replacing_field_names(
-            sql_query=sql_query
-        )
-
-        query_data = self.parse_sql_query(sql_query)
-
-        table_name = query_data["table_name"]
-
-        mapped_table_name = self.table_mappings[table_name]
-
-        sql_query_updated = sql_query_updated.replace("\n", " ")
-
-        sql_query_updated = sql_query_updated.replace('"', "'")
-
-        # Replace Table Name (We can update this at the Parse Script,
-        # if we do that but we can't get parsed query without replacing
-        # fields, or table_name with their respective mapped field)
-        sql_query_updated = (
-            sql_query_updated.replace(f'"{table_name}"', mapped_table_name)
-            .replace(f"`{table_name}`", mapped_table_name)
-            .replace(f"'{table_name}'", mapped_table_name)
-            .replace(f" {table_name} ", f" {mapped_table_name} ")
-            .replace(f" {table_name}", f" {mapped_table_name}")
-            .replace(f" {table_name};", f" {mapped_table_name};")
-        )
-
-        return sql_query_updated, query_data
 
     @staticmethod
     def prepare_expression_result_for_alias_expression(expression_response):
@@ -321,25 +283,9 @@ class SQLQueryConversion:
 
         return result
 
-    def get_stage_id_from_value(self, stage_name):
-        stage_name_and_id_mapping = {
-            stage_name: stage
-            for stage, stage_name in self.stage_mappings.items()
-        }
-
-        result = (
-            stage_name_and_id_mapping.get(stage_name)
-            if stage_name in stage_name_and_id_mapping
-            else ""
-        )
-
-        return result
-
     def prepare_expression_result(
         self, expression, parent_key=None, parent_field=None, source=None
     ):
-        if not parent_field:
-            parent_field = ""
         expression_type = expression.key
         #     print(expression, "Expression", expression_type)
 
@@ -360,26 +306,6 @@ class SQLQueryConversion:
                 "type": "column",
             }  # TODO Add field Mapping here
         elif expression_type == "literal":
-            parent_field_name = (
-                parent_field.get("field", "")
-                if type(parent_field) is dict
-                else ""
-            )
-
-            # if parent_field_name == self.stage_field:
-            #     if source and source == "OPEN_SEARCH_SQL_QUERY":
-            #         raise Exception(
-            #             f"Internal Exception: {self.stage_field} value can't "
-            #             f"override for SQL Query"
-            #         )
-            #
-            #     field_val = (
-            #         self.get_stage_id_from_value(
-            #             stage_name=expression.output_name
-            #         )
-            #         or expression.output_name
-            #     )
-            # else:
             field_val = expression.output_name
 
             response = {"value": field_val, "type": "literal"}
@@ -1611,3 +1537,33 @@ class SQLQueryConversion:
                 ] = field
 
         return updated_field_mappings
+
+    def get_converted_sql_query(self, sql_query):
+        sql_query_updated = self.get_sql_query_with_replacing_field_names(
+            sql_query=sql_query
+        )
+
+        query_data = self.parse_sql_query(sql_query)
+
+        table_name = query_data["table_name"]
+
+        mapped_table_name = self.table_mappings[table_name]
+
+        sql_query_updated = sql_query_updated.replace("\n", " ")
+
+        sql_query_updated = sql_query_updated.replace('"', "'")
+
+        # Replace Table Name (We can update this at the Parse Script,
+        # if we do that but we can't get parsed query without replacing
+        # fields, or table_name with their respective mapped field)
+        sql_query_updated = (
+            sql_query_updated.replace(f'"{table_name}"', mapped_table_name)
+            .replace(f"`{table_name}`", mapped_table_name)
+            .replace(f"'{table_name}'", mapped_table_name)
+            .replace(f" {table_name} ", f" {mapped_table_name} ")
+            .replace(f" {table_name}", f" {mapped_table_name}")
+            .replace(f" {table_name};", f" {mapped_table_name};")
+        )
+        print("Original sql query:", json.dumps(sql_query))
+        print("Updated sql query:", sql_query_updated)
+        return sql_query_updated, query_data
