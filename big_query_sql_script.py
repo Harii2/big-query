@@ -1519,7 +1519,7 @@ class SQLQueryConversion:
 
         for mapping in field_mappings:
             template_name = mapping["normalized_name"]
-
+            mapping["sales_template_id"] = f"`{mapping['sales_template_id']}`"
             updated_field_mappings[template_name] = mapping
 
             fields = (
@@ -1532,6 +1532,7 @@ class SQLQueryConversion:
 
             for field in fields:
                 field_name = field["normalized_name"]
+                field["field_id"] = f"`{field['field_id']}`"
                 updated_field_mappings[template_name]["fields"][
                     field_name
                 ] = field
