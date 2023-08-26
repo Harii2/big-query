@@ -1755,6 +1755,14 @@ field_mappings = [
     },
 ]
 
+# b875a502-43f1-11ee-be56-0242ac120002
+# ec7ee9d0-43f1-11ee-be56-0242ac120002
 if __name__ == "__main__":
     obj = SQLQueryConversion(table_mappings, field_mappings)
-    obj.get_converted_sql_query(queries[0])
+    # print(len(queries))
+    for q in queries:
+        obj.get_converted_sql_query(q)
+        print()
+        print()
+
+# 10 th index
