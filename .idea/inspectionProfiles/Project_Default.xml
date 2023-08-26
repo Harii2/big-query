@@ -1,0 +1,16 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="assignment5.models.Rating.*" />
+          <option value="assignment5.models.Actor.objects" />
+          <option value="assignment5.models.Cast.objects" />
+          <option value="assignment5.models.Movie.*" />
+          <option value="assignment6.models.Membership.*" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
