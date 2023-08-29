@@ -1,0 +1,21 @@
+service: bigQueryConverter
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.9
+  profile: ibuild-alpha
+  region: ap-south-1
+  logs:
+    restApi:
+      fullExecutionData: true
+
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: /
+          integration: lambda
+          method: post

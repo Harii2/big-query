@@ -1,4 +1,4 @@
-from big_query_sql_script import SQLQueryConversion
+from bigQueryConverter.big_query_sql_script import SQLQueryConversion
 
 queries = [
     'SELECT \n    "experienced_the_demo_demo_experienced_at_location" AS demo_location, \n    "stage_id", \n    COUNT("lead_id") AS number_of_leads \nFROM \n    `lead_details` \nGROUP BY \n    demo_location, \n    "stage_id";',

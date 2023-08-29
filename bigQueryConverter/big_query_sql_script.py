@@ -1,7 +1,7 @@
 import json
 import re
 from copy import deepcopy
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from sqlglot import exp, parse_one
 
@@ -12,23 +12,48 @@ def format_sql_query(sql_query: str):
 
 
 class SQLQueryConversion:
-    def __init__(
-        self,
-        table_mappings: Dict[str, str],
-        field_mappings: List[Dict],
-    ):
-        self.table_mappings = table_mappings
+    def __init__(self):
+        table_mappings, field_mappings = type(self)._fetch_required_data_mappings()
 
-        self.field_mappings = self.update_template_mappings(
+        self.table_mappings = table_mappings
+        self.field_mappings = self._update_template_mappings(
             field_mappings=deepcopy(field_mappings)
         )
-
         self.mapped_fields_dict = {}
-
         self.aliases = []
 
+    def get_converted_sql_query(self, sql_query: str) -> Tuple[str, Dict]:
+        sql_query_updated = self._get_sql_query_with_replacing_field_names(
+            sql_query=sql_query
+        )
+
+        query_data = self._parse_sql_query(sql_query)
+
+        table_name = query_data["table_name"]
+
+        mapped_table_name = self.table_mappings[table_name]
+
+        sql_query_updated = sql_query_updated.replace("\n", " ")
+
+        sql_query_updated = sql_query_updated.replace('"', "'")
+
+        # Replace Table Name (We can update this at the Parse Script,
+        # if we do that but we can't get parsed query without replacing
+        # fields, or table_name with their respective mapped field)
+        sql_query_updated = (
+            sql_query_updated.replace(f'"{table_name}"', mapped_table_name)
+            .replace(f"`{table_name}`", mapped_table_name)
+            .replace(f"'{table_name}'", mapped_table_name)
+            .replace(f" {table_name} ", f" {mapped_table_name} ")
+            .replace(f" {table_name}", f" {mapped_table_name}")
+            .replace(f" {table_name};", f" {mapped_table_name};")
+        )
+        print("Original sql query:", json.dumps(sql_query))
+        print("Updated sql query:", sql_query_updated)
+        return sql_query_updated, query_data
+
     @staticmethod
-    def prepare_expression_result_for_alias_expression(expression_response):
+    def _prepare_expression_result_for_alias_expression(expression_response):
         alias_expression = expression_response["alias_expression"]
 
         alias_expression_type = alias_expression.get("type")
@@ -186,7 +211,7 @@ class SQLQueryConversion:
         # print(f"Alias expression response: {alias_response}")
         return result
 
-    def prepare_expression_result_for_select_expression_response(
+    def _prepare_expression_result_for_select_expression_response(
         self,
         select_expression_responses: List,
     ):
@@ -217,7 +242,7 @@ class SQLQueryConversion:
                 aggregations.append(expression_response)
             elif expression_response_type == "alias_column":
                 alias_response = (
-                    self.prepare_expression_result_for_alias_expression(
+                    self._prepare_expression_result_for_alias_expression(
                         expression_response
                     )
                 )
@@ -283,7 +308,7 @@ class SQLQueryConversion:
 
         return result
 
-    def prepare_expression_result(
+    def _prepare_expression_result(
         self, expression, parent_key=None, parent_field=None, source=None
     ):
         expression_type = expression.key
@@ -310,7 +335,7 @@ class SQLQueryConversion:
 
             response = {"value": field_val, "type": "literal"}
         elif expression_type == "where":
-            response = self.prepare_expression_result(
+            response = self._prepare_expression_result(
                 expression.this, parent_key=expression_type, source=source
             )
         elif expression_type == "select":
@@ -323,7 +348,7 @@ class SQLQueryConversion:
                 if iter_key == "from":
                     response.update(
                         {
-                            "table_name": self.prepare_expression_result(
+                            "table_name": self._prepare_expression_result(
                                 iter_expression, source=source
                             )
                         }
@@ -331,14 +356,14 @@ class SQLQueryConversion:
                 elif iter_key == "where":
                     response.update(
                         {
-                            "conditions": self.prepare_expression_result(
+                            "conditions": self._prepare_expression_result(
                                 iter_expression, source=source
                             )
                         }
                     )
                 elif iter_key == "limit":
                     response.update(
-                        self.prepare_expression_result(
+                        self._prepare_expression_result(
                             iter_expression,
                             parent_key=expression_type,
                             source=source,
@@ -347,21 +372,21 @@ class SQLQueryConversion:
                 elif iter_key == "order":
                     response.update(
                         {
-                            "order_by": self.prepare_expression_result(
+                            "order_by": self._prepare_expression_result(
                                 iter_expression, source=source
                             )
                         }
                     )
                 elif iter_key == "expressions":
                     select_expression_responses.append(
-                        self.prepare_expression_result(
+                        self._prepare_expression_result(
                             iter_expression,
                             parent_key=expression_type,
                             source=source,
                         )
                     )
                 elif iter_key == "group":
-                    groups = self.prepare_expression_result(
+                    groups = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -376,7 +401,7 @@ class SQLQueryConversion:
                 response.update({"group_by_fields": groups})
 
             select_expression_result = (
-                self.prepare_expression_result_for_select_expression_response(
+                self._prepare_expression_result_for_select_expression_response(
                     select_expression_responses=select_expression_responses
                 )
             )
@@ -385,7 +410,7 @@ class SQLQueryConversion:
         elif expression_type == "subquery":
             for iter_key, iter_expression in expression.iter_expressions():
                 if iter_key == "this":
-                    sub_query_response = self.prepare_expression_result(
+                    sub_query_response = self._prepare_expression_result(
                         iter_expression, source=source
                     )
                     response = {
@@ -402,7 +427,7 @@ class SQLQueryConversion:
 
             for iter_key, iter_expression in expression.iter_expressions():
                 if iter_key == "this":
-                    left_val = self.prepare_expression_result(
+                    left_val = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -411,7 +436,7 @@ class SQLQueryConversion:
                     response = left_val
 
                 elif iter_key == "expression":
-                    right_val = self.prepare_expression_result(
+                    right_val = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -427,7 +452,7 @@ class SQLQueryConversion:
             for iter_key, iter_expression in expression.iter_expressions():
                 #             print(iter_key, type(iter_key), iter_expression)
                 if iter_key == "this":
-                    response = self.prepare_expression_result(
+                    response = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -437,7 +462,7 @@ class SQLQueryConversion:
                         f"'FROM' Expression Type -> '{iter_key}' Not handled"
                     )
         elif expression_type == "table":
-            response = self.prepare_expression_result(
+            response = self._prepare_expression_result(
                 expression.this, source=source
             )
             # TODO Add Table Mapping Here
@@ -450,7 +475,7 @@ class SQLQueryConversion:
                 #             print(iter_key, type(iter_key), iter_expression)
 
                 if iter_key == "this":
-                    field_info = self.prepare_expression_result(
+                    field_info = self._prepare_expression_result(
                         iter_expression, source=source
                     )
 
@@ -464,7 +489,7 @@ class SQLQueryConversion:
                 elif iter_key == "low":
                     response.update(
                         {
-                            "low": self.prepare_expression_result(
+                            "low": self._prepare_expression_result(
                                 iter_expression, source=source
                             )
                         }
@@ -472,7 +497,7 @@ class SQLQueryConversion:
                 elif iter_key == "high":
                     response.update(
                         {
-                            "high": self.prepare_expression_result(
+                            "high": self._prepare_expression_result(
                                 iter_expression, source=source
                             )
                         }
@@ -488,7 +513,7 @@ class SQLQueryConversion:
 
             for iter_key, iter_expression in expression.iter_expressions():
                 if iter_key == "this":
-                    field_dict = self.prepare_expression_result(
+                    field_dict = self._prepare_expression_result(
                         expression=iter_expression, source=source
                     )
 
@@ -497,7 +522,7 @@ class SQLQueryConversion:
                         "field": field_dict,
                     }
                 elif iter_key == "expressions":
-                    field_value_option = self.prepare_expression_result(
+                    field_value_option = self._prepare_expression_result(
                         expression=iter_expression, source=source
                     )
                     values_list.append(field_value_option)
@@ -516,7 +541,7 @@ class SQLQueryConversion:
                 method_params = []
 
                 for iter_key, iter_expression in expression.iter_expressions():
-                    param_resp = self.prepare_expression_result(
+                    param_resp = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -542,13 +567,13 @@ class SQLQueryConversion:
 
             for iter_key, iter_expression in expression.iter_expressions():
                 if iter_key == "this":
-                    where_field_exp_result = self.prepare_expression_result(
+                    where_field_exp_result = self._prepare_expression_result(
                         iter_expression, source=source
                     )
                     where_field = where_field_exp_result
 
                 else:
-                    where_val = self.prepare_expression_result(
+                    where_val = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         parent_field=where_field,
@@ -568,13 +593,13 @@ class SQLQueryConversion:
 
             for iter_key, iter_expression in expression.iter_expressions():
                 if iter_key == "this":
-                    where_field_exp_result = self.prepare_expression_result(
+                    where_field_exp_result = self._prepare_expression_result(
                         iter_expression, source=source
                     )
                     where_field = where_field_exp_result
 
                 else:
-                    where_val = self.prepare_expression_result(
+                    where_val = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -592,13 +617,13 @@ class SQLQueryConversion:
 
             for iter_key, iter_expression in expression.iter_expressions():
                 if iter_key == "this":
-                    where_field_exp_result = self.prepare_expression_result(
+                    where_field_exp_result = self._prepare_expression_result(
                         iter_expression, source=source
                     )
                     where_field = where_field_exp_result
 
                 else:
-                    where_val = self.prepare_expression_result(
+                    where_val = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -617,13 +642,13 @@ class SQLQueryConversion:
 
             for iter_key, iter_expression in expression.iter_expressions():
                 if iter_key == "this":
-                    where_field_exp_result = self.prepare_expression_result(
+                    where_field_exp_result = self._prepare_expression_result(
                         iter_expression, source=source
                     )
                     where_field = where_field_exp_result
 
                 else:
-                    where_val = self.prepare_expression_result(
+                    where_val = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -643,12 +668,12 @@ class SQLQueryConversion:
                 #             print("GTE", iter_key, iter_expression,
                 #             type(iter_expression))
                 if iter_key == "this":
-                    where_field_exp_result = self.prepare_expression_result(
+                    where_field_exp_result = self._prepare_expression_result(
                         iter_expression, source=source
                     )
                     where_field = where_field_exp_result
                 else:
-                    where_val = self.prepare_expression_result(
+                    where_val = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -666,13 +691,13 @@ class SQLQueryConversion:
 
             for iter_key, iter_expression in expression.iter_expressions():
                 if iter_key == "this":
-                    where_field_exp_result = self.prepare_expression_result(
+                    where_field_exp_result = self._prepare_expression_result(
                         iter_expression, source=source
                     )
                     where_field = where_field_exp_result
 
                 else:
-                    where_val = self.prepare_expression_result(
+                    where_val = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -689,7 +714,7 @@ class SQLQueryConversion:
 
             for iter_key, iter_expression in expression.iter_expressions():
                 #             print(iter_key, iter_expression)
-                expression_result = self.prepare_expression_result(
+                expression_result = self._prepare_expression_result(
                     iter_expression, source=source
                 )
 
@@ -704,7 +729,7 @@ class SQLQueryConversion:
 
             for iter_key, iter_expression in expression.iter_expressions():
                 #             print(iter_key, iter_expression)
-                expression_result = self.prepare_expression_result(
+                expression_result = self._prepare_expression_result(
                     iter_expression, source=source
                 )
 
@@ -715,13 +740,13 @@ class SQLQueryConversion:
                 {"conditional_or": conditional_items, "type": "or_condition"}
             )
         elif expression_type == "not":
-            response = self.prepare_expression_result(
+            response = self._prepare_expression_result(
                 expression.this, parent_key=expression_type, source=source
             )
         elif expression_type == "neg":
             for iter_key, iter_expression in expression.iter_expressions():
                 if iter_key == "this":
-                    val = self.prepare_expression_result(
+                    val = self._prepare_expression_result(
                         expression.this,
                         parent_key=expression_type,
                         source=source,
@@ -740,7 +765,7 @@ class SQLQueryConversion:
             response = []
 
             for iter_key, iter_expression in expression.iter_expressions():
-                field = self.prepare_expression_result(
+                field = self._prepare_expression_result(
                     iter_expression, parent_key=expression_type, source=source
                 )
 
@@ -763,7 +788,7 @@ class SQLQueryConversion:
 
             for iter_key, iter_expression in expression.iter_expressions():
                 order_by_fields.extend(
-                    self.prepare_expression_result(
+                    self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -777,7 +802,7 @@ class SQLQueryConversion:
             group_by_items = []
             for iter_key, iter_expression in expression.iter_expressions():
                 group_by_items.append(
-                    self.prepare_expression_result(
+                    self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -789,7 +814,7 @@ class SQLQueryConversion:
             )
         elif expression_type == "limit":
             response = {
-                "limit": self.prepare_expression_result(
+                "limit": self._prepare_expression_result(
                     expression.expression, source=source
                 ),
                 "type": "limit",
@@ -804,11 +829,11 @@ class SQLQueryConversion:
                 #             print("ALIAS", iter_key, type(iter_expression),
                 #             iter_expression.key, iter_expression)
                 if iter_key == "alias":
-                    alias_name = self.prepare_expression_result(
+                    alias_name = self._prepare_expression_result(
                         iter_expression, source=source
                     )
                 elif iter_key == "this":
-                    alias_expression = self.prepare_expression_result(
+                    alias_expression = self._prepare_expression_result(
                         iter_expression, source=source
                     )
                 else:
@@ -829,7 +854,7 @@ class SQLQueryConversion:
                 #             iter_expression.key, iter_expression)
 
                 count_fields.append(
-                    self.prepare_expression_result(
+                    self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -845,7 +870,7 @@ class SQLQueryConversion:
 
             for iter_key, iter_expression in expression.iter_expressions():
                 avg_fields.append(
-                    self.prepare_expression_result(
+                    self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -862,13 +887,13 @@ class SQLQueryConversion:
 
             for iter_key, iter_expression in expression.iter_expressions():
                 if iter_key == "this":
-                    left_val = self.prepare_expression_result(
+                    left_val = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
                     )
                 else:
-                    right_val = self.prepare_expression_result(
+                    right_val = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -887,13 +912,13 @@ class SQLQueryConversion:
                 #             type(iter_expression), iter_expression.key,
                 #             iter_expression)
                 if iter_key == "this":
-                    left_val = self.prepare_expression_result(
+                    left_val = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
                     )
                 else:
-                    right_val = self.prepare_expression_result(
+                    right_val = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -915,7 +940,7 @@ class SQLQueryConversion:
                 # print(iter_key, type(iter_expression.key),
                 # iter_expression.key, iter_expression)
                 if iter_expression.key == "column":
-                    field_name = self.prepare_expression_result(
+                    field_name = self._prepare_expression_result(
                         iter_expression, source=source
                     )["field"]
 
@@ -949,7 +974,7 @@ class SQLQueryConversion:
 
             for iter_key, iter_expression in expression.iter_expressions():
                 if iter_expression.key == "column":
-                    field_name = self.prepare_expression_result(
+                    field_name = self._prepare_expression_result(
                         iter_expression, source=source
                     )["field"]
                 elif iter_expression.key == "literal":
@@ -977,7 +1002,7 @@ class SQLQueryConversion:
                 #             type(iter_expression.key), iter_expression.key,
                 #             iter_expression)
                 fields.append(
-                    self.prepare_expression_result(
+                    self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -993,7 +1018,7 @@ class SQLQueryConversion:
 
             for iter_key, iter_expression in expression.iter_expressions():
                 sum_fields.append(
-                    self.prepare_expression_result(
+                    self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -1013,13 +1038,13 @@ class SQLQueryConversion:
                 #             type(iter_expression), iter_expression.key,
                 #             iter_expression)
                 if iter_key == "this":
-                    left_val = self.prepare_expression_result(
+                    left_val = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
                     )
                 else:
-                    right_val = self.prepare_expression_result(
+                    right_val = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -1038,13 +1063,13 @@ class SQLQueryConversion:
                 #             type(iter_expression), iter_expression.key,
                 #             iter_expression)
                 if iter_key == "this":
-                    left_val = self.prepare_expression_result(
+                    left_val = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
                     )
                 else:
-                    right_val = self.prepare_expression_result(
+                    right_val = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -1059,7 +1084,7 @@ class SQLQueryConversion:
 
             for iter_key, iter_expression in expression.iter_expressions():
                 fields.append(
-                    self.prepare_expression_result(
+                    self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -1078,14 +1103,14 @@ class SQLQueryConversion:
                 #             print("CASE", iter_key, iter_expression,
                 #             type(iter_expression))
                 if iter_key == "default":
-                    default = self.prepare_expression_result(
+                    default = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
                     )
                 elif iter_key == "ifs":
                     cases.append(
-                        self.prepare_expression_result(
+                        self._prepare_expression_result(
                             iter_expression,
                             parent_key=expression_type,
                             source=source,
@@ -1105,13 +1130,13 @@ class SQLQueryConversion:
 
             for iter_key, iter_expression in expression.iter_expressions():
                 if iter_key == "this":
-                    condition = self.prepare_expression_result(
+                    condition = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
                     )
                 elif iter_key == "true":
-                    condition_value = self.prepare_expression_result(
+                    condition_value = self._prepare_expression_result(
                         iter_expression, source=source
                     )
                 else:
@@ -1125,7 +1150,7 @@ class SQLQueryConversion:
         elif expression_type == "date":
             for iter_key, iter_expression in expression.iter_expressions():
                 if iter_key == "this" or iter_key == "expressions":
-                    field = self.prepare_expression_result(
+                    field = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -1139,7 +1164,7 @@ class SQLQueryConversion:
         elif expression_type == "month":
             for iter_key, iter_expression in expression.iter_expressions():
                 if iter_key == "this":
-                    field = self.prepare_expression_result(
+                    field = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -1153,7 +1178,7 @@ class SQLQueryConversion:
         elif expression_type == "year":
             for iter_key, iter_expression in expression.iter_expressions():
                 if iter_key == "this":
-                    field = self.prepare_expression_result(
+                    field = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -1167,7 +1192,7 @@ class SQLQueryConversion:
         elif expression_type == "week":
             for iter_key, iter_expression in expression.iter_expressions():
                 if iter_key == "this":
-                    field = self.prepare_expression_result(
+                    field = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -1183,7 +1208,7 @@ class SQLQueryConversion:
 
             for iter_key, iter_expression in expression.iter_expressions():
                 if iter_key == "this":
-                    field = self.prepare_expression_result(
+                    field = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -1195,7 +1220,7 @@ class SQLQueryConversion:
                         }
                     )
                 elif iter_key == "unit":
-                    unit = self.prepare_expression_result(
+                    unit = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -1216,13 +1241,13 @@ class SQLQueryConversion:
 
             for iter_key, iter_expression in expression.iter_expressions():
                 if iter_key == "this":
-                    left_val = self.prepare_expression_result(
+                    left_val = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
                     )
                 else:
-                    right_val = self.prepare_expression_result(
+                    right_val = self._prepare_expression_result(
                         iter_expression,
                         parent_key=expression_type,
                         source=source,
@@ -1264,12 +1289,12 @@ class SQLQueryConversion:
         return response
 
     @staticmethod
-    def replace_whole_word(query, old_word, new_word):
+    def _replace_whole_word(query, old_word, new_word):
         pattern = r"(?<!`)\b{}\b(?!`)".format(re.escape(old_word))
         replaced_query = re.sub(pattern, new_word, query)
         return replaced_query
 
-    def get_sql_query_with_replacing_field_names(self, sql_query):
+    def _get_sql_query_with_replacing_field_names(self, sql_query):
         aliases = []
 
         for item in parse_one(format_sql_query(sql_query)).find_all(exp.Alias):
@@ -1293,7 +1318,7 @@ class SQLQueryConversion:
             (
                 mapping_field,
                 mapping_field_type,
-            ) = self.get_field_mapping_if_exists(field_name)
+            ) = self._get_field_mapping_if_exists(field_name)
 
             if mapping_field:
                 mapped_fields_dict.update({mapping_field: field_name})
@@ -1311,13 +1336,13 @@ class SQLQueryConversion:
                 print(f"Mapping field_uuid not found for '{field_name}'")
 
             if "." in field_name:
-                sql_query = self.replace_whole_word(
+                sql_query = self._replace_whole_word(
                     query=sql_query,
                     old_word=field_name,
                     new_word=f"`{mapping_field}`",
                 )
             else:
-                sql_query = self.replace_whole_word(
+                sql_query = self._replace_whole_word(
                     query=sql_query,
                     old_word=field_name,
                     new_word=f"{mapping_field}",
@@ -1328,7 +1353,7 @@ class SQLQueryConversion:
         return sql_query
 
     @staticmethod
-    def starts_with_any(string, prefixes):
+    def _starts_with_any(string, prefixes):
         response = ""
 
         for prefix in prefixes:
@@ -1336,10 +1361,10 @@ class SQLQueryConversion:
                 response = prefix
         return response
 
-    def get_field_mapping_if_exists(self, field_name):
+    def _get_field_mapping_if_exists(self, field_name):
         # print("Field: ", field_name)
 
-        matched_template = self.starts_with_any(
+        matched_template = self._starts_with_any(
             field_name, list(self.field_mappings.keys())
         )
 
@@ -1399,15 +1424,15 @@ class SQLQueryConversion:
 
         return None, None
 
-    def parse_sql_query(self, sql_query: str):
+    def _parse_sql_query(self, sql_query: str):
         select_expression = parse_one(format_sql_query(sql_query))
-        query_data = self.prepare_expression_result(
+        query_data = self._prepare_expression_result(
             expression=select_expression, source="OPEN_SEARCH_SQL_QUERY"
         )
         return query_data
 
     @staticmethod
-    def get_alias_config(alias, aliases):
+    def _get_alias_config(alias, aliases):
         matched_alias = None
 
         for item in aliases:
@@ -1417,9 +1442,9 @@ class SQLQueryConversion:
                 break
         return matched_alias
 
-    def get_field_for_given_alias(self, alias: str, aliases: List[Dict]):
+    def _get_field_for_given_alias(self, alias: str, aliases: List[Dict]):
         # print(f"Alias: {aliases}")
-        matched_alias = self.get_alias_config(alias=alias, aliases=aliases)
+        matched_alias = self._get_alias_config(alias=alias, aliases=aliases)
 
         if matched_alias and matched_alias["type"] == "alias_column":
             return matched_alias["field"]
@@ -1501,7 +1526,7 @@ class SQLQueryConversion:
                 )
 
     @staticmethod
-    def get_alias_for_given_field(field: str, aliases: List[Dict]):
+    def _get_alias_for_given_field(field: str, aliases: List[Dict]):
         matched_alias = None
 
         for item in aliases:
@@ -1514,7 +1539,7 @@ class SQLQueryConversion:
             return matched_alias["alias"]
 
     @staticmethod
-    def update_template_mappings(field_mappings):
+    def _update_template_mappings(field_mappings):
         updated_field_mappings = {}
 
         for mapping in field_mappings:
@@ -1539,32 +1564,35 @@ class SQLQueryConversion:
 
         return updated_field_mappings
 
-    def get_converted_sql_query(self, sql_query):
-        sql_query_updated = self.get_sql_query_with_replacing_field_names(
-            sql_query=sql_query
-        )
+    @classmethod
+    def _fetch_required_data_mappings(cls) -> Tuple[Dict[str, str], List[Dict]]:
+        file_path = "tables.json"
+        with open(file_path, "r") as json_file:
+            data = json.load(json_file)
 
-        query_data = self.parse_sql_query(sql_query)
+        table_wise_data_mappings = [
+            cls._prep_table_data_mapping_json(table_dict)
+            for table_dict in data
+        ]
+        table_mappings = {
+            tb_data_mapping["sales_template_name"]: tb_data_mapping["normalized_name"]
+            for tb_data_mapping in table_wise_data_mappings
+        }
+        return table_mappings, table_wise_data_mappings
 
-        table_name = query_data["table_name"]
-
-        mapped_table_name = self.table_mappings[table_name]
-
-        sql_query_updated = sql_query_updated.replace("\n", " ")
-
-        sql_query_updated = sql_query_updated.replace('"', "'")
-
-        # Replace Table Name (We can update this at the Parse Script,
-        # if we do that but we can't get parsed query without replacing
-        # fields, or table_name with their respective mapped field)
-        sql_query_updated = (
-            sql_query_updated.replace(f'"{table_name}"', mapped_table_name)
-            .replace(f"`{table_name}`", mapped_table_name)
-            .replace(f"'{table_name}'", mapped_table_name)
-            .replace(f" {table_name} ", f" {mapped_table_name} ")
-            .replace(f" {table_name}", f" {mapped_table_name}")
-            .replace(f" {table_name};", f" {mapped_table_name};")
-        )
-        print("Original sql query:", json.dumps(sql_query))
-        print("Updated sql query:", sql_query_updated)
-        return sql_query_updated, query_data
+    @classmethod
+    def _prep_table_data_mapping_json(cls, table_dict: Dict) -> Dict:
+        return {
+            "sales_template_name": table_dict["Table Name"],
+            "normalized_name": table_dict["Table Name"],
+            "sales_template_id": table_dict["sales_template_id"],
+            "sales_template_type": table_dict["sales_template_type"],
+            "fields": [
+                {
+                    "field_name": field_dict["field_name"],
+                    "normalized_name": field_dict["field_id"],
+                    "field_id": field_dict["field_id"],
+                    "field_type": field_dict["field_type"],
+                } for field_dict in table_dict.get("fields", [])
+            ]
+        }
