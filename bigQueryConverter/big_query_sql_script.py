@@ -5,6 +5,8 @@ from typing import Dict, List, Tuple
 
 from sqlglot import exp, parse_one
 
+import exceptions
+
 
 def format_sql_query(sql_query: str):
     sql_query = sql_query.replace("`", "'")
@@ -33,7 +35,7 @@ class SQLQueryConversion:
 
         mapped_table_name = self.table_mappings.get(table_name)
         if not mapped_table_name:
-            raise Exception("Table name mapping does not exists")
+            raise exceptions.TableNameMappingNotFound(table_name=table_name)
 
         sql_query_updated = sql_query_updated.replace("\n", " ")
 
