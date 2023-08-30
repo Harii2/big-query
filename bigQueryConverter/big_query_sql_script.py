@@ -31,7 +31,9 @@ class SQLQueryConversion:
 
         table_name = query_data["table_name"]
 
-        mapped_table_name = self.table_mappings[table_name]
+        mapped_table_name = self.table_mappings.get(table_name)
+        if not mapped_table_name:
+            raise Exception("Table name mapping does not exists")
 
         sql_query_updated = sql_query_updated.replace("\n", " ")
 
@@ -48,7 +50,7 @@ class SQLQueryConversion:
             .replace(f" {table_name}", f" {mapped_table_name}")
             .replace(f" {table_name};", f" {mapped_table_name};")
         )
-        print("Original sql query:", json.dumps(sql_query))
+        print("Original sql query(json):", json.dumps(sql_query))
         print("Updated sql query:", sql_query_updated)
         return sql_query_updated, query_data
 

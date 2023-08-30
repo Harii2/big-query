@@ -3,7 +3,7 @@ frameworkVersion: '3'
 
 provider:
   name: aws
-  runtime: python3.9
+  runtime: python3.8
   profile: ibuild-alpha
   region: ap-south-1
   logs:
@@ -19,3 +19,16 @@ functions:
           path: /
           integration: lambda
           method: post
+
+package:
+  patterns:
+    - "!*.pyc"
+    - "!venv"
+    - "!env_*.json"
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+
+plugins:
+  - serverless-python-requirements
