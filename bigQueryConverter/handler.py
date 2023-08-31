@@ -11,7 +11,7 @@ def hello(event, context):
     sql_query = event["body"]["sql_query"]
     try:
         util = BigQueryConverterInteractor()
-        updated_query, query_data = util.get_converted_sql_query(sql_query=sql_query)
+        updated_query = util.get_converted_sql_query(sql_query=sql_query)
     except exceptions.TableNameMappingNotFound as err:
         return {"statusCode": 400, "body": json.dumps({
             "reason": f"TableNameMappingNotFound: {err.table_name}"
@@ -22,7 +22,6 @@ def hello(event, context):
         "body": json.dumps(
             {
                 "updated_query": updated_query,
-                # "query_data": query_data
             }
         )
     }
