@@ -1294,23 +1294,7 @@ class SQLQueryConversion:
         replaced_query = re.sub(pattern, new_word, query)
         return replaced_query
 
-    def _get_sql_query_with_replacing_field_names(self, sql_query):
-        aliases = []
-
-        for item in parse_one(format_sql_query(sql_query)).find_all(exp.Alias):
-            aliases.append(item.output_name)
-
-        field_names = []
-
-        for item in parse_one(format_sql_query(sql_query)).find_all(
-            exp.Column
-        ):
-            field_names.append(item.output_name)
-
-        #     print("Field_names: ", field_names)
-
-        mapped_fields_dict = {}
-
+    def get_mapped_field_dict(self, field_names, mapped_fields_dict, sql_query):
         for field_name in field_names:
             #         if field_name in aliases:
             #             continue
@@ -1348,6 +1332,24 @@ class SQLQueryConversion:
                     new_word=f"{mapping_field}",
                 )
 
+    def _get_sql_query_with_replacing_field_names(self, sql_query):
+        aliases = []
+
+        for item in parse_one(format_sql_query(sql_query)).find_all(exp.Alias):
+            aliases.append(item.output_name)
+
+        field_names = []
+
+        for item in parse_one(format_sql_query(sql_query)).find_all(
+                exp.Column
+        ):
+            field_names.append(item.output_name)
+
+        #     print("Field_names: ", field_names)
+
+        mapped_fields_dict = {}
+        self.get_mapped_field_dict(field_names, mapped_fields_dict, sql_query)
+
         self.mapped_fields_dict = mapped_fields_dict
 
         return sql_query
@@ -1376,13 +1378,13 @@ class SQLQueryConversion:
             updated_field_name = template_id
 
             field_name_without_template_name = field_name[
-                len(matched_template) + 1 :
-            ]
+                                               len(matched_template) + 1:
+                                               ]
 
             matched_field = (
                 field_name_without_template_name
                 if field_name_without_template_name
-                in self.field_mappings[matched_template]["fields"].keys()
+                   in self.field_mappings[matched_template]["fields"].keys()
                 else None
             )
 
@@ -1441,6 +1443,9 @@ class SQLQueryConversion:
                 matched_alias = item
                 break
         return matched_alias
+
+    # def _get_field_name_for_aggregation_type(self):
+
 
     def _get_field_for_given_alias(self, alias: str, aliases: List[Dict]):
         # print(f"Alias: {aliases}")
@@ -1566,7 +1571,7 @@ class SQLQueryConversion:
 
     @classmethod
     def _fetch_required_data_mappings(cls) -> Tuple[Dict[str, str], List[Dict]]:
-        file_path = "tables.json"
+        file_path = "examples.json"
         with open(file_path, "r") as json_file:
             data = json.load(json_file)
 
@@ -1590,7 +1595,7 @@ class SQLQueryConversion:
             "fields": [
                 {
                     "field_name": field_dict["field_name"],
-                    "normalized_name": field_dict["field_id"],
+                    "normalized_name": field_dict["field_name"],
                     "field_id": field_dict["field_id"],
                     "field_type": field_dict["field_type"],
                 } for field_dict in table_dict.get("fields", [])
