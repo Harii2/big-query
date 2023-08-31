@@ -5,12 +5,12 @@ def hello(event, context):
     print("event:", event)
     print("context:", context)
 
-    from big_query_sql_script import SQLQueryConversion
+    from big_query_converter import BigQueryConverterInteractor
     import exceptions
 
     sql_query = event["body"]["sql_query"]
     try:
-        util = SQLQueryConversion()
+        util = BigQueryConverterInteractor()
         updated_query, query_data = util.get_converted_sql_query(sql_query=sql_query)
     except exceptions.TableNameMappingNotFound as err:
         return {"statusCode": 400, "body": json.dumps({
