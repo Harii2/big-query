@@ -3,6 +3,7 @@ import sqlglot
 from typing import Tuple, Dict, List
 
 import exceptions
+import re
 
 
 class BigQueryConverterInteractor:
@@ -49,7 +50,7 @@ class BigQueryConverterInteractor:
         return updated_query
 
     def _replace_field_names(
-        self, sql_query: str, table_name: str, field_names: List[str]
+            self, sql_query: str, table_name: str, field_names: List[str]
     ) -> str:
         for f_name in field_names:
             field_mapping_key = self._prep_field_mapping_key(
@@ -57,8 +58,13 @@ class BigQueryConverterInteractor:
                 field_name=f_name
             )
             bq_field_name = self.field_mapping[field_mapping_key]["bigquery_column_name"]
-            sql_query = sql_query.replace(f_name, bq_field_name)
+            sql_query = BigQueryConverterInteractor._replace_whole_word(sql_query, f_name, bq_field_name)
         return sql_query
+
+    def _replace_whole_word(query, old_word, new_word):
+        pattern = r'\b' + re.escape(old_word) + r'\b(?![a-zA-Z0-9_])'
+        modified_text = re.sub(pattern, new_word, query)
+        return modified_text
 
     @staticmethod
     def _replace_table_name(table_name: str, bq_table_name: str, sql_query: str) -> str:
@@ -73,7 +79,7 @@ class BigQueryConverterInteractor:
 
     @staticmethod
     def _get_table_name_from_select_expression(
-        select_expression: sqlglot.expressions.Expression
+            select_expression: sqlglot.expressions.Expression
     ) -> str:
         return select_expression.args["from"].this.name
 
@@ -105,7 +111,19 @@ class BigQueryConverterInteractor:
         return query.replace("`", "'")
 
 
-# if __name__ == "__main__":
-#     interactor = BigQueryConverterInteractor()
-#     input_sql_query = "select count(CASE WHEN creation_datetime = 2020 THEN 1 END) as ct, lead_id , live_session_qualified_tag as act from online_live_session_qualification where live_session_qualified_channel like '%12%' and live_session_qualified_tag > 123 HAVING act > 3;"
-#     print(interactor.get_converted_sql_query(input_sql_query))
+if __name__ == "__main__":
+    interactor = BigQueryConverterInteractor()
+    input_sql_query = """
+SELECT 
+    creation_datetime, 
+    lead_id, 
+    live_session_qualified_tag, 
+    live_session_qualified_channel, 
+    live_session_qualified_language, 
+    live_session_qualified_cycle, 
+    live_session_qualification_date, 
+    id
+FROM 
+    online_live_session_qualification;
+"""
+    print(interactor.get_converted_sql_query(input_sql_query))
