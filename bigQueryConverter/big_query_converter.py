@@ -19,9 +19,9 @@ class BigQueryConverterInteractor:
         table_name = self._get_table_name_from_select_expression(select_expression)
         field_names = [
             expression.this.name
-            for expression in select_expression.expressions
+            for expression in list(select_expression.find_all(sqlglot.expressions.Column))
         ]
-
+        # where_field_name = [arg.where.this.name for arg in select_expression.args]
         bq_table_name = self.table_mapping.get(table_name)
         no_mapping_field_names = [
             f_name for f_name in field_names
@@ -33,7 +33,8 @@ class BigQueryConverterInteractor:
         if not bq_table_name:
             raise exceptions.TableNameMappingNotFound(table_name=table_name)
         if no_mapping_field_names:
-            raise exceptions.NoMappingFoundForFieldNames(field_names=field_names)
+            field_names = [f_name for f_name in field_names if f_name not in no_mapping_field_names]
+            # raise exceptions.NoMappingFoundForFieldNames(field_names=field_names)
 
         updated_query = self._replace_table_name(
             table_name=table_name,
@@ -104,7 +105,7 @@ class BigQueryConverterInteractor:
         return query.replace("`", "'")
 
 
-if __name__ == "__main__":
-    interactor = BigQueryConverterInteractor()
-    input_sql_query = "select creation_datetime cd, lead_id lid from online_live_session_qualification;"
-    print(interactor.get_converted_sql_query(input_sql_query))
+# if __name__ == "__main__":
+#     interactor = BigQueryConverterInteractor()
+#     input_sql_query = "select count(CASE WHEN creation_datetime = 2020 THEN 1 END) as ct, lead_id , live_session_qualified_tag as act from online_live_session_qualification where live_session_qualified_channel like '%12%' and live_session_qualified_tag > 123 HAVING act > 3;"
+#     print(interactor.get_converted_sql_query(input_sql_query))
