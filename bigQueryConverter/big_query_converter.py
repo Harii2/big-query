@@ -102,3 +102,9 @@ class BigQueryConverterInteractor:
     @staticmethod
     def format_sql_query(query: str):
         return query.replace("`", "'")
+
+
+if __name__ == "__main__":
+    interactor = BigQueryConverterInteractor()
+    input_sql_query = "select creation_datetime cd, lead_id lid from online_live_session_qualification;"
+    print(interactor.get_converted_sql_query(input_sql_query))

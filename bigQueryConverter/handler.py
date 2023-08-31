@@ -16,6 +16,10 @@ def hello(event, context):
         return {"statusCode": 400, "body": json.dumps({
             "reason": f"TableNameMappingNotFound: {err.table_name}"
         })}
+    except exceptions.NoMappingFoundForFieldNames as err:
+        return {"statusCode": 400, "body": json.dumps({
+            "reason": f"NoMappingFoundForFieldNames: {err.field_names}"
+        })}
 
     return {
         "statusCode": 200,
