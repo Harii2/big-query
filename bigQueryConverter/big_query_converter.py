@@ -111,19 +111,19 @@ class BigQueryConverterInteractor:
         return query.replace("`", "'")
 
 
-if __name__ == "__main__":
-    interactor = BigQueryConverterInteractor()
-    input_sql_query = """
-SELECT 
-    creation_datetime, 
-    lead_id, 
-    live_session_qualified_tag, 
-    live_session_qualified_channel, 
-    live_session_qualified_language, 
-    live_session_qualified_cycle, 
-    live_session_qualification_date, 
-    id
-FROM 
-    online_live_session_qualification;
-"""
-    print(interactor.get_converted_sql_query(input_sql_query))
+# if __name__ == "__main__":
+#     interactor = BigQueryConverterInteractor()
+#     input_sql_query = """
+# SELECT
+#     creation_datetime,
+#     lead_id,
+#     live_session_qualified_tag,
+#     live_session_qualified_channel,
+#     live_session_qualified_language,
+#     live_session_qualified_cycle,
+#     live_session_qualification_date,
+#     id
+# FROM
+#     online_live_session_qualification;
+# """
+#     print(interactor.get_converted_sql_query(input_sql_query))
