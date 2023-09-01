@@ -35,7 +35,7 @@ class SQLQueryConversion:
 
         mapped_table_name = self.table_mappings.get(table_name)
         if not mapped_table_name:
-            raise exceptions.TableNameMappingNotFound(table_name=table_name)
+            raise exceptions.TableNamesMappingNotFound(table_name=table_name)
 
         sql_query_updated = sql_query_updated.replace("\n", " ")
 

@@ -12,7 +12,7 @@ def hello(event, context):
     try:
         util = BigQueryConverterInteractor()
         updated_query = util.get_converted_sql_query(sql_query=sql_query)
-    except exceptions.TableNameMappingNotFound as err:
+    except exceptions.TableNamesMappingNotFound as err:
         return {"statusCode": 400, "body": json.dumps({
             "reason": f"TableNameMappingNotFound: {err.table_name}"
         })}

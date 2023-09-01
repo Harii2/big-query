@@ -17,46 +17,36 @@ class BigQueryConverterInteractor:
 
     def get_converted_sql_query(self, sql_query: str) -> str:
         select_expression = sqlglot.parse_one(self.format_sql_query(sql_query))
-        table_name = self._get_table_name_from_select_expression(select_expression)
+        table_names = self._get_table_name_from_select_expression(select_expression)
         field_names = [
             expression.this.name
             for expression in list(select_expression.find_all(sqlglot.expressions.Column))
         ]
-        # where_field_name = [arg.where.this.name for arg in select_expression.args]
-        bq_table_name = self.table_mapping.get(table_name)
+
         no_mapping_field_names = [
             f_name for f_name in field_names
-            if not self.field_mapping.get(self._prep_field_mapping_key(
-                table_name=table_name,
-                field_name=f_name
-            ))
+            if not self.field_mapping.get(self._prep_field_mapping_key(field_name=f_name))
         ]
-        if not bq_table_name:
-            raise exceptions.TableNameMappingNotFound(table_name=table_name)
         if no_mapping_field_names:
             field_names = [f_name for f_name in field_names if f_name not in no_mapping_field_names]
             # raise exceptions.NoMappingFoundForFieldNames(field_names=field_names)
 
-        updated_query = self._replace_table_name(
-            table_name=table_name,
-            bq_table_name=bq_table_name,
-            sql_query=sql_query
-        )
         updated_query = self._replace_field_names(
-            sql_query=updated_query,
-            table_name=table_name,
+            sql_query=sql_query,
             field_names=field_names
+        )
+
+        updated_query = self._replace_table_names(
+            table_names=table_names,
+            sql_query=updated_query
         )
         return updated_query
 
     def _replace_field_names(
-            self, sql_query: str, table_name: str, field_names: List[str]
+            self, sql_query: str,  field_names: List[str]
     ) -> str:
         for f_name in field_names:
-            field_mapping_key = self._prep_field_mapping_key(
-                table_name=table_name,
-                field_name=f_name
-            )
+            field_mapping_key = self._prep_field_mapping_key(field_name=f_name)
             bq_field_name = self.field_mapping[field_mapping_key]["bigquery_column_name"]
             sql_query = BigQueryConverterInteractor._replace_whole_word(sql_query, f_name, bq_field_name)
         return sql_query
@@ -66,22 +56,31 @@ class BigQueryConverterInteractor:
         modified_text = re.sub(pattern, new_word, query)
         return modified_text
 
-    @staticmethod
-    def _replace_table_name(table_name: str, bq_table_name: str, sql_query: str) -> str:
-        return (
-            sql_query.replace(f'"{table_name}"', bq_table_name)
-            .replace(f"`{table_name}`", bq_table_name)
-            .replace(f"'{table_name}'", bq_table_name)
-            .replace(f" {table_name} ", f" {bq_table_name} ")
-            .replace(f" {table_name}", f" {bq_table_name}")
-            .replace(f" {table_name};", f" {bq_table_name};")
-        )
+    def _replace_table_names(self, table_names: List[str], sql_query: str) -> str:
+        no_mapping_table_names = [
+            tb_name for tb_name in table_names
+            if tb_name not in self.table_mapping
+        ]
+        if no_mapping_table_names:
+            raise exceptions.TableNamesMappingNotFound(table_names=no_mapping_table_names)
+
+        for table_name in table_names:
+            bq_table_name = self.table_mapping[table_name]
+            sql_query = (
+                sql_query.replace(f'"{table_name}"', bq_table_name)
+                .replace(f"`{table_name}`", bq_table_name)
+                .replace(f"'{table_name}'", bq_table_name)
+                .replace(f" {table_name} ", f" {bq_table_name} ")
+                .replace(f" {table_name}", f" {bq_table_name}")
+                .replace(f" {table_name};", f" {bq_table_name};")
+            )
+        return sql_query
 
     @staticmethod
     def _get_table_name_from_select_expression(
             select_expression: sqlglot.expressions.Expression
-    ) -> str:
-        return select_expression.args["from"].this.name
+    ) -> List[str]:
+        return [ table.this.name for table in list(select_expression.find_all(sqlglot.expressions.Table))]
 
     @classmethod
     def _fetch_required_data_mappings(cls) -> Tuple[Dict[str, str], Dict[str, Dict]]:
@@ -95,16 +94,13 @@ class BigQueryConverterInteractor:
             table_mapping[table_name] = f"`{table_dict['big_query_table_name']}`"
             for field_dict in table_dict["fields"]:
                 field_dict["bigquery_column_name"] = f"`{field_dict['bigquery_column_name']}`"
-                field_key_ = cls._prep_field_mapping_key(
-                    table_name=table_name,
-                    field_name=field_dict["field_name"]
-                )
+                field_key_ = cls._prep_field_mapping_key(field_name=field_dict["field_name"])
                 field_mapping[field_key_] = field_dict
         return table_mapping, field_mapping
 
     @staticmethod
-    def _prep_field_mapping_key(table_name: str, field_name: str) -> str:
-        return f"{table_name}#{field_name}"
+    def _prep_field_mapping_key(field_name: str) -> str:
+        return field_name
 
     @staticmethod
     def format_sql_query(query: str):
@@ -124,6 +120,8 @@ class BigQueryConverterInteractor:
 #     live_session_qualification_date,
 #     id
 # FROM
-#     online_live_session_qualification;
+#     online_live_session_qualification
+#     WHERE (SELECT user_device_model_from_gtm FROM contacts ) > 100
+#     ;
 # """
 #     print(interactor.get_converted_sql_query(input_sql_query))

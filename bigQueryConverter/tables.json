@@ -180,7 +180,7 @@
   {
     "Table Description": "Basic contact information of the leads along with their personal biodata",
     "Table Name": "contacts",
-    "big_query_table_name": "contacts",
+    "big_query_table_name": "contacts#12345",
     "fields": [
       {
         "bigquery_column_name": "field_9ba4cd77_1ac1_4a20_8197_992fcea0ad61",

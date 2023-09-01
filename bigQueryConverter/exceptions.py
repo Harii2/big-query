@@ -1,9 +1,9 @@
 from typing import List
 
 
-class TableNameMappingNotFound(Exception):
-    def __init__(self, table_name: str):
-        self.table_name = table_name
+class TableNamesMappingNotFound(Exception):
+    def __init__(self, table_names: List[str]):
+        self.table_names = table_names
 
 
 class NoMappingFoundForFieldNames(Exception):
