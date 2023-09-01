@@ -17,7 +17,7 @@ class BigQueryConverterInteractor:
 
     def get_converted_sql_query(self, sql_query: str) -> str:
         select_expression = sqlglot.parse_one(self.format_sql_query(sql_query))
-        table_names = self._get_table_name_from_select_expression(select_expression)
+        table_names = self._get_table_names_from_select_expression(select_expression)
         field_names = [
             expression.this.name
             for expression in list(select_expression.find_all(sqlglot.expressions.Column))
@@ -51,6 +51,7 @@ class BigQueryConverterInteractor:
             sql_query = BigQueryConverterInteractor._replace_whole_word(sql_query, f_name, bq_field_name)
         return sql_query
 
+    @staticmethod
     def _replace_whole_word(query, old_word, new_word):
         pattern = r'\b' + re.escape(old_word) + r'\b(?![a-zA-Z0-9_])'
         modified_text = re.sub(pattern, new_word, query)
@@ -77,10 +78,10 @@ class BigQueryConverterInteractor:
         return sql_query
 
     @staticmethod
-    def _get_table_name_from_select_expression(
+    def _get_table_names_from_select_expression(
             select_expression: sqlglot.expressions.Expression
     ) -> List[str]:
-        return [ table.this.name for table in list(select_expression.find_all(sqlglot.expressions.Table))]
+        return [table.this.name for table in list(select_expression.find_all(sqlglot.expressions.Table))]
 
     @classmethod
     def _fetch_required_data_mappings(cls) -> Tuple[Dict[str, str], Dict[str, Dict]]:

@@ -14,7 +14,7 @@ def hello(event, context):
         updated_query = util.get_converted_sql_query(sql_query=sql_query)
     except exceptions.TableNamesMappingNotFound as err:
         return {"statusCode": 400, "body": json.dumps({
-            "reason": f"TableNameMappingNotFound: {err.table_name}"
+            "reason": f"TableNameMappingNotFound: {err.table_names}"
         })}
     except exceptions.NoMappingFoundForFieldNames as err:
         return {"statusCode": 400, "body": json.dumps({
