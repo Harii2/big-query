@@ -1,9 +1,8 @@
 import json
-import sqlglot
+import re
 from typing import Tuple, Dict, List
 
-import exceptions
-import re
+import sqlglot
 
 
 class BigQueryConverterInteractor:
@@ -58,15 +57,10 @@ class BigQueryConverterInteractor:
         return modified_text
 
     def _replace_table_names(self, table_names: List[str], sql_query: str) -> str:
-        no_mapping_table_names = [
-            tb_name for tb_name in table_names
-            if tb_name not in self.table_mapping
-        ]
-        if no_mapping_table_names:
-            raise exceptions.TableNamesMappingNotFound(table_names=no_mapping_table_names)
-
         for table_name in table_names:
-            bq_table_name = self.table_mapping[table_name]
+            bq_table_name = self.table_mapping.get(table_name)
+            if not bq_table_name:
+                continue
             sql_query = (
                 sql_query.replace(f'"{table_name}"', bq_table_name)
                 .replace(f"`{table_name}`", bq_table_name)

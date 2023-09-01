@@ -5,16 +5,6 @@
     "big_query_table_name": "activity_d766ccbc_659b_4b39_9120_f7d3ad451ddb",
     "fields": [
       {
-        "bigquery_column_name": "field_28d93f26_cda7_46a3_b8d7_a4959bcc122a",
-        "field_description": "",
-        "field_id": "28d93f26-cda7-46a3-b8d7-a4959bcc122a",
-        "field_name": "creation_datetime",
-        "field_type": "DATE_TIME",
-        "fk_config": null,
-        "is_primary_key": false,
-        "options": []
-      },
-      {
         "bigquery_column_name": "lead_id",
         "field_description": "",
         "field_id": "lead_id",
@@ -42,6 +32,16 @@
           "Nurturing Live Interactions",
           "Nurturing Product Demo"
         ]
+      },
+      {
+        "bigquery_column_name": "field_d766ccbc_659b_4b39_9120_f7d3ad451ddb",
+        "field_description": "",
+        "field_id": "d766ccbc-659b-4b39-9120-f7d3ad451ddb",
+        "field_name": "online_live_session_qualified_activity_id",
+        "field_type": "PLAIN_TEXT",
+        "fk_config": null,
+        "is_primary_key": true,
+        "options": []
       },
       {
         "bigquery_column_name": "field_105ce405_5188_4b14_a4e6_e04ef276b127",
@@ -111,16 +111,6 @@
         "fk_config": null,
         "is_primary_key": false,
         "options": []
-      },
-      {
-        "bigquery_column_name": "field_d766ccbc_659b_4b39_9120_f7d3ad451ddb",
-        "field_description": "",
-        "field_id": "d766ccbc-659b-4b39-9120-f7d3ad451ddb",
-        "field_name": "id",
-        "field_type": "PLAIN_TEXT",
-        "fk_config": null,
-        "is_primary_key": true,
-        "options": []
       }
     ],
     "sales_template_id": "online_live_session_qualification",
@@ -136,17 +126,7 @@
         "bigquery_column_name": "gender",
         "field_description": "",
         "field_id": "gender",
-        "field_name": "gender",
-        "field_type": "PLAIN_TEXT",
-        "fk_config": null,
-        "is_primary_key": false,
-        "options": []
-      },
-      {
-        "bigquery_column_name": "last_name",
-        "field_description": "",
-        "field_id": "last_name",
-        "field_name": "last_name",
+        "field_name": "user_gender",
         "field_type": "PLAIN_TEXT",
         "fk_config": null,
         "is_primary_key": false,
@@ -156,20 +136,10 @@
         "bigquery_column_name": "id",
         "field_description": "Unique User Id",
         "field_id": "id",
-        "field_name": "id",
+        "field_name": "user_id",
         "field_type": "INTEGER",
         "fk_config": null,
         "is_primary_key": true,
-        "options": []
-      },
-      {
-        "bigquery_column_name": "name",
-        "field_description": "",
-        "field_id": "name",
-        "field_name": "name",
-        "field_type": "PLAIN_TEXT",
-        "fk_config": null,
-        "is_primary_key": false,
         "options": []
       }
     ],
@@ -180,7 +150,7 @@
   {
     "Table Description": "Basic contact information of the leads along with their personal biodata",
     "Table Name": "contacts",
-    "big_query_table_name": "contacts#12345",
+    "big_query_table_name": "contacts",
     "fields": [
       {
         "bigquery_column_name": "field_9ba4cd77_1ac1_4a20_8197_992fcea0ad61",
@@ -252,116 +222,6 @@
         "options": []
       },
       {
-        "bigquery_column_name": "field_7e675dfa_5023_4188_b78d_d926fea605ac",
-        "field_description": "",
-        "field_id": "7e675dfa-5023-4188-b78d-d926fea605ac",
-        "field_name": "academic_department",
-        "field_type": "FIELDS_SELECTOR",
-        "fk_config": null,
-        "is_primary_key": false,
-        "options": [
-          "11th / 12th Medical",
-          "11th / Intermediate 1st Year (MPC / PCM)",
-          "12th / Intermediate 2nd Year (MPC / PCM)",
-          "Aeronautical Engineering",
-          "Aerospace Engineering",
-          "Agricultural Engineering",
-          "Automobile Engineering",
-          "Bachelor of Architecture (B.Arch)",
-          "Bachelor of Arts (B.A)",
-          "Bachelor of Business Administration (B.B.A)",
-          "Bachelor of Business Management (B.B.M)",
-          "Bachelor of Business Studies (B.B.S)",
-          "Bachelor of Commerce (B.Com)",
-          "Bachelor of Computer Applications (B.C.A)",
-          "Bachelor of Computer Science (B.C.S)",
-          "Bachelor of Economics (B.Econ)",
-          "Bachelor of Education (B.Ed.)",
-          "Bachelor of Hotel Management (B.H.M)",
-          "Bachelor of Management Studies (B.M.S)",
-          "Bachelor of Medicine and Bachelor of Surgery (M.B.B.S)",
-          "Bachelor of Pharmacy (B.Pharmacy)",
-          "Bachelor of Science (B.Sc.)",
-          "Bachelor of Science in Computer Science (B.Sc. Computer Science)",
-          "Biochemical Engineering",
-          "Biomedical Engineering",
-          "Biotechnology",
-          "Ceramic Engineering",
-          "Chartered Accountant (CA)",
-          "Chemical and Alcohol Technology",
-          "Chemical and Polymer Engineering",
-          "Chemical Engineering (CHE)",
-          "Civil Engineering (CE)",
-          "Computational Engineering and Networking (CEN)",
-          "Computer Integrated Design & Manufacturing",
-          "Computer Science and Business Systems",
-          "Computer Science and Engineering (Artificial Intelligence and Machine Learning - AI & ML)",
-          "Computer Science and Engineering (Artificial Intelligence and Robotics)",
-          "Computer Science and Engineering (Block Chain Technology)",
-          "Computer Science and Engineering (Cloud Computing)",
-          "Computer Science and Engineering (Cyber Security)",
-          "Computer Science and Engineering (Data Science - DS)",
-          "Computer Science and Engineering (Internet of Things - IoT)",
-          "Computer Science and Information Systems",
-          "Computer Science and Information Technology (CSIT)",
-          "Computer Science Engineering (CSE)",
-          "Computing and Information Technology",
-          "Construction Engineering",
-          "Corrosion Engineering",
-          "Cryptographic Engineering",
-          "Data Science",
-          "Diploma / Polytechnic",
-          "Electrical and Communications Engineering",
-          "Electrical and Electronics Engineering (EEE)",
-          "Electrical and Information Engineering",
-          "Electrical Engineering - Power & Automation",
-          "Electrical Engineering (EE)",
-          "Electronics and Communication Engineering (ECE)",
-          "Electronics and Computer Engineering",
-          "Electronics and Electrical Communication Engineering",
-          "Electronics and Instrumentation Engineering (EIE)",
-          "Electronics and Telecommunication Engineering (ETE)",
-          "Electronics Engineering - Design and Manufacturing",
-          "Electronics Instrumentation and Control",
-          "Energy Engineering",
-          "Engineering Physics",
-          "Environmental Engineering",
-          "Food Engineering",
-          "Genetic Engineering",
-          "Geotechnical Engineering",
-          "Industrial and Production Engineering (IPE)",
-          "Industrial and Systems Engineering",
-          "Industrial Engineering (IE)",
-          "Information and Communication Technology",
-          "Information Science and Engineering",
-          "Information Technology (IT)",
-          "Instrumentation Engineering",
-          "ITI",
-          "Manufacturing Science and Engineering",
-          "Manufacturing Technology",
-          "Marine Engineering",
-          "Materials Engineering",
-          "Mechanical and Industrial Engineering",
-          "Mechanical Engineering (ME)",
-          "Mechatronics Engineering",
-          "Metallurgical and Materials Engineering (MME)",
-          "Mining Engineering",
-          "Molecular and Cellular Engineering",
-          "Nano Technology Engineering",
-          "Naval Architecture and Ocean Engineering",
-          "Nuclear Engineering",
-          "Ocean Engineering",
-          "Polymer Science and Technology",
-          "Power Engineering",
-          "Production Engineering",
-          "Robotics Engineering",
-          "Telecommunication Engineering",
-          "Textile Engineering",
-          "Tool Engineering",
-          "Other"
-        ]
-      },
-      {
         "bigquery_column_name": "field_25823917_6e4d_415f_a62d_2d26df7ae425",
         "field_description": "",
         "field_id": "25823917-6e4d-415f-a62d-2d26df7ae425",
@@ -430,6 +290,16 @@
           "2026",
           "Other"
         ]
+      },
+      {
+        "bigquery_column_name": "contact_id",
+        "field_description": "",
+        "field_id": "contact_id",
+        "field_name": "contact_id",
+        "field_type": "PLAIN_TEXT",
+        "fk_config": null,
+        "is_primary_key": true,
+        "options": []
       },
       {
         "bigquery_column_name": "field_674f82f4_8ddd_443c_924b_3fcc373ee9c2",
@@ -562,14 +432,114 @@
         ]
       },
       {
-        "bigquery_column_name": "contact_id",
+        "bigquery_column_name": "field_7e675dfa_5023_4188_b78d_d926fea605ac",
         "field_description": "",
-        "field_id": "contact_id",
-        "field_name": "id",
-        "field_type": "PLAIN_TEXT",
+        "field_id": "7e675dfa-5023-4188-b78d-d926fea605ac",
+        "field_name": "academic_department",
+        "field_type": "FIELDS_SELECTOR",
         "fk_config": null,
-        "is_primary_key": true,
-        "options": []
+        "is_primary_key": false,
+        "options": [
+          "11th / 12th Medical",
+          "11th / Intermediate 1st Year (MPC / PCM)",
+          "12th / Intermediate 2nd Year (MPC / PCM)",
+          "Aeronautical Engineering",
+          "Aerospace Engineering",
+          "Agricultural Engineering",
+          "Automobile Engineering",
+          "Bachelor of Architecture (B.Arch)",
+          "Bachelor of Arts (B.A)",
+          "Bachelor of Business Administration (B.B.A)",
+          "Bachelor of Business Management (B.B.M)",
+          "Bachelor of Business Studies (B.B.S)",
+          "Bachelor of Commerce (B.Com)",
+          "Bachelor of Computer Applications (B.C.A)",
+          "Bachelor of Computer Science (B.C.S)",
+          "Bachelor of Economics (B.Econ)",
+          "Bachelor of Education (B.Ed.)",
+          "Bachelor of Hotel Management (B.H.M)",
+          "Bachelor of Management Studies (B.M.S)",
+          "Bachelor of Medicine and Bachelor of Surgery (M.B.B.S)",
+          "Bachelor of Pharmacy (B.Pharmacy)",
+          "Bachelor of Science (B.Sc.)",
+          "Bachelor of Science in Computer Science (B.Sc. Computer Science)",
+          "Biochemical Engineering",
+          "Biomedical Engineering",
+          "Biotechnology",
+          "Ceramic Engineering",
+          "Chartered Accountant (CA)",
+          "Chemical and Alcohol Technology",
+          "Chemical and Polymer Engineering",
+          "Chemical Engineering (CHE)",
+          "Civil Engineering (CE)",
+          "Computational Engineering and Networking (CEN)",
+          "Computer Integrated Design & Manufacturing",
+          "Computer Science and Business Systems",
+          "Computer Science and Engineering (Artificial Intelligence and Machine Learning - AI & ML)",
+          "Computer Science and Engineering (Artificial Intelligence and Robotics)",
+          "Computer Science and Engineering (Block Chain Technology)",
+          "Computer Science and Engineering (Cloud Computing)",
+          "Computer Science and Engineering (Cyber Security)",
+          "Computer Science and Engineering (Data Science - DS)",
+          "Computer Science and Engineering (Internet of Things - IoT)",
+          "Computer Science and Information Systems",
+          "Computer Science and Information Technology (CSIT)",
+          "Computer Science Engineering (CSE)",
+          "Computing and Information Technology",
+          "Construction Engineering",
+          "Corrosion Engineering",
+          "Cryptographic Engineering",
+          "Data Science",
+          "Diploma / Polytechnic",
+          "Electrical and Communications Engineering",
+          "Electrical and Electronics Engineering (EEE)",
+          "Electrical and Information Engineering",
+          "Electrical Engineering - Power & Automation",
+          "Electrical Engineering (EE)",
+          "Electronics and Communication Engineering (ECE)",
+          "Electronics and Computer Engineering",
+          "Electronics and Electrical Communication Engineering",
+          "Electronics and Instrumentation Engineering (EIE)",
+          "Electronics and Telecommunication Engineering (ETE)",
+          "Electronics Engineering - Design and Manufacturing",
+          "Electronics Instrumentation and Control",
+          "Energy Engineering",
+          "Engineering Physics",
+          "Environmental Engineering",
+          "Food Engineering",
+          "Genetic Engineering",
+          "Geotechnical Engineering",
+          "Industrial and Production Engineering (IPE)",
+          "Industrial and Systems Engineering",
+          "Industrial Engineering (IE)",
+          "Information and Communication Technology",
+          "Information Science and Engineering",
+          "Information Technology (IT)",
+          "Instrumentation Engineering",
+          "ITI",
+          "Manufacturing Science and Engineering",
+          "Manufacturing Technology",
+          "Marine Engineering",
+          "Materials Engineering",
+          "Mechanical and Industrial Engineering",
+          "Mechanical Engineering (ME)",
+          "Mechatronics Engineering",
+          "Metallurgical and Materials Engineering (MME)",
+          "Mining Engineering",
+          "Molecular and Cellular Engineering",
+          "Nano Technology Engineering",
+          "Naval Architecture and Ocean Engineering",
+          "Nuclear Engineering",
+          "Ocean Engineering",
+          "Polymer Science and Technology",
+          "Power Engineering",
+          "Production Engineering",
+          "Robotics Engineering",
+          "Telecommunication Engineering",
+          "Textile Engineering",
+          "Tool Engineering",
+          "Other"
+        ]
       },
       {
         "bigquery_column_name": "field_659a84f5_075b_43e8_b42a_f339aaddf015",
@@ -608,13 +578,37 @@
         "field_description": "stage from which the lead transitioned",
         "field_id": "from_stage_id",
         "field_name": "from_stage_id",
-        "field_type": "PLAIN_TEXT",
+        "field_type": "DROPDOWN",
         "fk_config": {
           "field_name": "id",
           "table_name": "stages"
         },
         "is_primary_key": false,
-        "options": []
+        "options": [
+          "Fresh Leads",
+          "Call Initiated Leads",
+          "Parent Nurturing",
+          "Student Nurturing",
+          "Registered For Webinar",
+          "Webinar or Live Session Attended",
+          "Qualified",
+          "Contact Again",
+          "Yet To Convince Student",
+          "Yet To Speak With DM",
+          "Yet To Give Commitment",
+          "Commitment Given",
+          "Seat Reserved",
+          "Contact Again for Enrollment",
+          "Yet To Decide To Pay",
+          "Decided To Pay",
+          "Enrolled",
+          "Choosing Not To Join",
+          "Discard",
+          "Not Relevant To Academy",
+          "Failed After Multiple Attempts",
+          "Lead Lost",
+          "Not Interested"
+        ]
       },
       {
         "bigquery_column_name": "pipeline_item_id",
@@ -634,13 +628,37 @@
         "field_description": "stage to which the lead transitioned",
         "field_id": "to_stage_id",
         "field_name": "to_stage_id",
-        "field_type": "PLAIN_TEXT",
+        "field_type": "DROPDOWN",
         "fk_config": {
           "field_name": "id",
           "table_name": "stages"
         },
         "is_primary_key": false,
-        "options": []
+        "options": [
+          "Fresh Leads",
+          "Call Initiated Leads",
+          "Parent Nurturing",
+          "Student Nurturing",
+          "Registered For Webinar",
+          "Webinar or Live Session Attended",
+          "Qualified",
+          "Contact Again",
+          "Yet To Convince Student",
+          "Yet To Speak With DM",
+          "Yet To Give Commitment",
+          "Commitment Given",
+          "Seat Reserved",
+          "Contact Again for Enrollment",
+          "Yet To Decide To Pay",
+          "Decided To Pay",
+          "Enrolled",
+          "Choosing Not To Join",
+          "Discard",
+          "Not Relevant To Academy",
+          "Failed After Multiple Attempts",
+          "Lead Lost",
+          "Not Interested"
+        ]
       }
     ],
     "sales_template_id": "stage_change_logs",
@@ -683,20 +701,10 @@
         "bigquery_column_name": "field_f8ad0659_7b1b_4a81_a700_c58278c84863",
         "field_description": "",
         "field_id": "f8ad0659-7b1b-4a81-a700-c58278c84863",
-        "field_name": "creation_datetime",
+        "field_name": "seat_reserved_datetime",
         "field_type": "DATE_TIME",
         "fk_config": null,
         "is_primary_key": false,
-        "options": []
-      },
-      {
-        "bigquery_column_name": "field_26e62567_720f_4ab9_b750_bb36a4986201",
-        "field_description": "",
-        "field_id": "26e62567-720f-4ab9-b750-bb36a4986201",
-        "field_name": "id",
-        "field_type": "PLAIN_TEXT",
-        "fk_config": null,
-        "is_primary_key": true,
         "options": []
       },
       {
@@ -710,6 +718,16 @@
           "table_name": "leads"
         },
         "is_primary_key": false,
+        "options": []
+      },
+      {
+        "bigquery_column_name": "field_26e62567_720f_4ab9_b750_bb36a4986201",
+        "field_description": "",
+        "field_id": "26e62567-720f-4ab9-b750-bb36a4986201",
+        "field_name": "seat_reservation_id",
+        "field_type": "PLAIN_TEXT",
+        "fk_config": null,
+        "is_primary_key": true,
         "options": []
       }
     ],
@@ -742,6 +760,16 @@
           "field_name": "id",
           "table_name": "users"
         },
+        "is_primary_key": false,
+        "options": []
+      },
+      {
+        "bigquery_column_name": "field_499b1572_a866_45a2_9f8c_b6102bb96201",
+        "field_description": "",
+        "field_id": "499b1572-a866-45a2-9f8c-b6102bb96201",
+        "field_name": "first_enrolled_date",
+        "field_type": "DATE",
+        "fk_config": null,
         "is_primary_key": false,
         "options": []
       },
@@ -796,16 +824,6 @@
         "fk_config": null,
         "is_primary_key": false,
         "options": [""]
-      },
-      {
-        "bigquery_column_name": "id",
-        "field_description": "Unique Id of the Lead, generated by the CRM",
-        "field_id": "id",
-        "field_name": "id",
-        "field_type": "PLAIN_TEXT",
-        "fk_config": null,
-        "is_primary_key": true,
-        "options": []
       },
       {
         "bigquery_column_name": "field_7394884d_0a9f_46e8_ab4a_325529e92004",
@@ -1017,13 +1035,13 @@
         ]
       },
       {
-        "bigquery_column_name": "field_499b1572_a866_45a2_9f8c_b6102bb96201",
-        "field_description": "",
-        "field_id": "499b1572-a866-45a2-9f8c-b6102bb96201",
-        "field_name": "first_enrolled_date",
-        "field_type": "DATE",
+        "bigquery_column_name": "id",
+        "field_description": "Unique Id of the Lead, generated by the CRM",
+        "field_id": "id",
+        "field_name": "lead_id",
+        "field_type": "PLAIN_TEXT",
         "fk_config": null,
-        "is_primary_key": false,
+        "is_primary_key": true,
         "options": []
       },
       {
@@ -1086,13 +1104,13 @@
         "options": []
       },
       {
-        "bigquery_column_name": "id",
-        "field_description": "Id of the log",
-        "field_id": "id",
-        "field_name": "id",
-        "field_type": "PLAIN_TEXT",
+        "bigquery_column_name": "assignee_updated_on",
+        "field_description": "",
+        "field_id": "assignee_updated_on",
+        "field_name": "assignee_updation_datetime",
+        "field_type": "DATE_TIME",
         "fk_config": null,
-        "is_primary_key": true,
+        "is_primary_key": false,
         "options": []
       },
       {
@@ -1109,13 +1127,13 @@
         "options": []
       },
       {
-        "bigquery_column_name": "assignee_updated_on",
-        "field_description": "",
-        "field_id": "assignee_updated_on",
-        "field_name": "assignee_updation_datetime",
-        "field_type": "DATE_TIME",
+        "bigquery_column_name": "id",
+        "field_description": "Id of the log",
+        "field_id": "id",
+        "field_name": "assignee_change_log_id",
+        "field_type": "PLAIN_TEXT",
         "fk_config": null,
-        "is_primary_key": false,
+        "is_primary_key": true,
         "options": []
       }
     ],
@@ -1156,10 +1174,34 @@
         "field_description": "Stage of then Lead when this call happened ",
         "field_id": "pipeline_item_stage_id",
         "field_name": "lead_stage_id",
-        "field_type": "PLAIN_TEXT",
+        "field_type": "DROPDOWN",
         "fk_config": null,
         "is_primary_key": false,
-        "options": []
+        "options": [
+          "Fresh Leads",
+          "Call Initiated Leads",
+          "Parent Nurturing",
+          "Student Nurturing",
+          "Registered For Webinar",
+          "Webinar or Live Session Attended",
+          "Qualified",
+          "Contact Again",
+          "Yet To Convince Student",
+          "Yet To Speak With DM",
+          "Yet To Give Commitment",
+          "Commitment Given",
+          "Seat Reserved",
+          "Contact Again for Enrollment",
+          "Yet To Decide To Pay",
+          "Decided To Pay",
+          "Enrolled",
+          "Choosing Not To Join",
+          "Discard",
+          "Not Relevant To Academy",
+          "Failed After Multiple Attempts",
+          "Lead Lost",
+          "Not Interested"
+        ]
       },
       {
         "bigquery_column_name": "call_duration_in_sec",
@@ -1169,6 +1211,16 @@
         "field_type": "FLOAT",
         "fk_config": null,
         "is_primary_key": false,
+        "options": []
+      },
+      {
+        "bigquery_column_name": "call_log_id",
+        "field_description": "Unique Call Log Id",
+        "field_id": "call_log_id",
+        "field_name": "call_log_id",
+        "field_type": "PLAIN_TEXT",
+        "fk_config": null,
+        "is_primary_key": true,
         "options": []
       },
       {
@@ -1192,16 +1244,6 @@
         "field_type": "DATE_TIME",
         "fk_config": null,
         "is_primary_key": false,
-        "options": []
-      },
-      {
-        "bigquery_column_name": "call_log_id",
-        "field_description": "Unique Call Log Id",
-        "field_id": "call_log_id",
-        "field_name": "id",
-        "field_type": "PLAIN_TEXT",
-        "fk_config": null,
-        "is_primary_key": true,
         "options": []
       },
       {
@@ -1337,16 +1379,6 @@
         ]
       },
       {
-        "bigquery_column_name": "field_010bb7b3_ac8e_4df6_93b6_5df19d34cc0f",
-        "field_description": "",
-        "field_id": "010bb7b3-ac8e-4df6-93b6-5df19d34cc0f",
-        "field_name": "whatsapp_consent",
-        "field_type": "DROPDOWN",
-        "fk_config": null,
-        "is_primary_key": false,
-        "options": ["Yes", "No"]
-      },
-      {
         "bigquery_column_name": "field_d5b336f7_2181_4568_857d_291ec3de4e33",
         "field_description": "",
         "field_id": "d5b336f7-2181-4568-857d-291ec3de4e33",
@@ -1357,26 +1389,10 @@
         "options": []
       },
       {
-        "bigquery_column_name": "field_07eb515e_f688_469d_82ff_ed39a5f14ec0",
-        "field_description": "",
-        "field_id": "07eb515e-f688-469d-82ff-ed39a5f14ec0",
-        "field_name": "product_code",
-        "field_type": "DROPDOWN",
-        "fk_config": null,
-        "is_primary_key": false,
-        "options": [
-          "Affiliate",
-          "General",
-          "Inbound",
-          "Outbound",
-          "SocialMedia"
-        ]
-      },
-      {
-        "bigquery_column_name": "field_0f7ac21c_5a01_47a4_a815_a5c46ef146a1",
+        "bigquery_column_name": "field_ ",
         "field_description": "Unique id for registration",
-        "field_id": "0f7ac21c-5a01-47a4-a815-a5c46ef146a1",
-        "field_name": "id",
+        "field_id": " ",
+        "field_name": "webinar_registration_activity_id",
         "field_type": "PLAIN_TEXT",
         "fk_config": null,
         "is_primary_key": true,
@@ -1396,7 +1412,7 @@
         "bigquery_column_name": "field_5f7e8e66_9d5e_4ea6_b29d_93aaea18a33b",
         "field_description": "",
         "field_id": "5f7e8e66-9d5e-4ea6-b29d-93aaea18a33b",
-        "field_name": "creation_datetime",
+        "field_name": "enrolled_datetime",
         "field_type": "DATE_TIME",
         "fk_config": null,
         "is_primary_key": false,
@@ -1416,16 +1432,6 @@
         "options": []
       },
       {
-        "bigquery_column_name": "field_cb9b885f_6ec4_4392_a955_05d2db691982",
-        "field_description": "",
-        "field_id": "cb9b885f-6ec4-4392-a955-05d2db691982",
-        "field_name": "payment_plan",
-        "field_type": "DROPDOWN",
-        "fk_config": null,
-        "is_primary_key": false,
-        "options": ["Full Payment", "EMI", "Downpayment + EMI", "Installments"]
-      },
-      {
         "bigquery_column_name": "field_9fff2ae7_1c7e_472c_acb4_7bfb686c57cb",
         "field_description": "",
         "field_id": "9fff2ae7-1c7e-472c-acb4-7bfb686c57cb",
@@ -1436,10 +1442,30 @@
         "options": []
       },
       {
+        "bigquery_column_name": "field_cb9b885f_6ec4_4392_a955_05d2db691982",
+        "field_description": "",
+        "field_id": "cb9b885f-6ec4-4392-a955-05d2db691982",
+        "field_name": "enrolled_payment_plan",
+        "field_type": "DROPDOWN",
+        "fk_config": null,
+        "is_primary_key": false,
+        "options": ["Full Payment", "EMI", "Downpayment + EMI", "Installments"]
+      },
+      {
+        "bigquery_column_name": "field_4d1ac2cd_b53a_4919_aea8_c8a8d4bfe851",
+        "field_description": "",
+        "field_id": "4d1ac2cd-b53a-4919-aea8-c8a8d4bfe851",
+        "field_name": "enrollment_id",
+        "field_type": "PLAIN_TEXT",
+        "fk_config": null,
+        "is_primary_key": true,
+        "options": []
+      },
+      {
         "bigquery_column_name": "field_a3e9d9d6_c90d_4ccd_8121_c0323b072318",
         "field_description": "",
         "field_id": "a3e9d9d6-c90d-4ccd-8121-c0323b072318",
-        "field_name": "product_code",
+        "field_name": "enrolled_product_code",
         "field_type": "DROPDOWN",
         "fk_config": null,
         "is_primary_key": false,
@@ -1452,16 +1478,6 @@
           "Edge",
           "Fundamentals"
         ]
-      },
-      {
-        "bigquery_column_name": "field_4d1ac2cd_b53a_4919_aea8_c8a8d4bfe851",
-        "field_description": "",
-        "field_id": "4d1ac2cd-b53a-4919-aea8-c8a8d4bfe851",
-        "field_name": "id",
-        "field_type": "PLAIN_TEXT",
-        "fk_config": null,
-        "is_primary_key": true,
-        "options": []
       }
     ],
     "sales_template_id": "enrolled",
@@ -1469,60 +1485,10 @@
     "sales_template_type": "ACTIVITY"
   },
   {
-    "Table Description": "",
-    "Table Name": "stages",
-    "big_query_table_name": "stages_5c8a3b39_3e20_476c_b196_e3a2abd8742b",
-    "fields": [
-      {
-        "bigquery_column_name": "stage_order",
-        "field_description": "",
-        "field_id": "stage_order",
-        "field_name": "order",
-        "field_type": "INTEGER",
-        "fk_config": null,
-        "is_primary_key": false,
-        "options": []
-      },
-      {
-        "bigquery_column_name": "stage_id",
-        "field_description": "Unique id of the stage",
-        "field_id": "stage_id",
-        "field_name": "id",
-        "field_type": "PLAIN_TEXT",
-        "fk_config": null,
-        "is_primary_key": true,
-        "options": []
-      },
-      {
-        "bigquery_column_name": "stage_name",
-        "field_description": "",
-        "field_id": "stage_name",
-        "field_name": "name",
-        "field_type": "PLAIN_TEXT",
-        "fk_config": null,
-        "is_primary_key": false,
-        "options": []
-      }
-    ],
-    "sales_template_id": "stages",
-    "sales_template_name": "stages",
-    "sales_template_type": "APP_INTERNAL_TABLES"
-  },
-  {
     "Table Description": "Online Live Sessions serve as a tool for lead qualification. Leads can access these sessions through a unique link after providing their details. Upon completion, a form is shared;",
     "Table Name": "online_live_session",
     "big_query_table_name": "",
     "fields": [
-      {
-        "bigquery_column_name": "field_25e67cca_f179_4d9f_ae1c_c586764d64dd",
-        "field_description": "",
-        "field_id": "25e67cca-f179-4d9f-ae1c-c586764d64dd",
-        "field_name": "creation_datetime",
-        "field_type": "DATE_TIME",
-        "fk_config": null,
-        "is_primary_key": false,
-        "options": []
-      },
       {
         "bigquery_column_name": "lead_id",
         "field_description": "",
@@ -1581,10 +1547,20 @@
         "bigquery_column_name": "field_54cdedd9_034f_4bc4_b6c2_fd6a26a12203",
         "field_description": "Unique id for online live session attendance",
         "field_id": "54cdedd9-034f-4bc4-b6c2-fd6a26a12203",
-        "field_name": "id",
+        "field_name": "online_live_session_attended_activity_id",
         "field_type": "PLAIN_TEXT",
         "fk_config": null,
         "is_primary_key": true,
+        "options": []
+      },
+      {
+        "bigquery_column_name": "field_25e67cca_f179_4d9f_ae1c_c586764d64dd",
+        "field_description": "",
+        "field_id": "25e67cca-f179-4d9f-ae1c-c586764d64dd",
+        "field_name": "online_live_session_attended_datetime",
+        "field_type": "DATE_TIME",
+        "fk_config": null,
+        "is_primary_key": false,
         "options": []
       }
     ],
@@ -1619,16 +1595,6 @@
         ]
       },
       {
-        "bigquery_column_name": "field_a5b27cf8_bac3_4b8b_a1ae_eaf0a7d16c5e",
-        "field_description": "",
-        "field_id": "a5b27cf8-bac3-4b8b-a1ae-eaf0a7d16c5e",
-        "field_name": "creation_datetime",
-        "field_type": "DATE_TIME",
-        "fk_config": null,
-        "is_primary_key": false,
-        "options": []
-      },
-      {
         "bigquery_column_name": "lead_id",
         "field_description": "",
         "field_id": "lead_id",
@@ -1642,6 +1608,16 @@
         "options": []
       },
       {
+        "bigquery_column_name": "field_a5b27cf8_bac3_4b8b_a1ae_eaf0a7d16c5e",
+        "field_description": "",
+        "field_id": "a5b27cf8-bac3-4b8b-a1ae-eaf0a7d16c5e",
+        "field_name": "webinar_watched_datetime",
+        "field_type": "DATE_TIME",
+        "fk_config": null,
+        "is_primary_key": false,
+        "options": []
+      },
+      {
         "bigquery_column_name": "field_1eaa37cc_6c2c_4a61_9cec_1bb3ee23bee3",
         "field_description": "",
         "field_id": "1eaa37cc-6c2c-4a61-9cec-1bb3ee23bee3",
@@ -1649,6 +1625,16 @@
         "field_type": "FLOAT",
         "fk_config": null,
         "is_primary_key": false,
+        "options": []
+      },
+      {
+        "bigquery_column_name": "field_23c273cf_dd9d_4dc4_8425_0ae09cb81cf0",
+        "field_description": "Unique id ",
+        "field_id": "23c273cf-dd9d-4dc4-8425-0ae09cb81cf0",
+        "field_name": "webinar_watched_activity_id",
+        "field_type": "PLAIN_TEXT",
+        "fk_config": null,
+        "is_primary_key": true,
         "options": []
       },
       {
@@ -1669,16 +1655,6 @@
         "field_type": "DATE",
         "fk_config": null,
         "is_primary_key": false,
-        "options": []
-      },
-      {
-        "bigquery_column_name": "field_23c273cf_dd9d_4dc4_8425_0ae09cb81cf0",
-        "field_description": "Unique id ",
-        "field_id": "23c273cf-dd9d-4dc4-8425-0ae09cb81cf0",
-        "field_name": "id",
-        "field_type": "PLAIN_TEXT",
-        "fk_config": null,
-        "is_primary_key": true,
         "options": []
       }
     ],
